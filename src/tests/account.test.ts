@@ -91,9 +91,6 @@ describe("Account", () => {
       .send({ query })
       .expect(200)
 
-
     expect(response.body.data.createAccount.__typename).toBe("InvalidCpf");
-
-
   })
 })
