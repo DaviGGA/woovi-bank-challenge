@@ -1,0 +1,15 @@
+type Query {
+  hello: String
+  say(name: String!): String
+}
+
+type Account {
+  id: ID!
+  name: String
+  cpf: String
+  createdAt: String
+}
+
+type Mutation {
+  createAccount(name: String, cpf: String): Account
+}
