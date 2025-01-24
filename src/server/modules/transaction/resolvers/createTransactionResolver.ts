@@ -1,3 +1,4 @@
+import { redisClient } from "../../../config/redis";
 import { Account, IAccount } from "../../account/AccountModel";
 import { AmountNonPositive, AmountNonPositiveType } from "../errors/AmountNonPositiveType";
 import { SenderNotEnoughBalance } from "../errors/SenderNotEnoughBalanceType";
@@ -16,7 +17,7 @@ type Result = ITransaction
  | SenderNotEnoughBalance
 
 export const createTransactionResolver = async ({ input }: Input): Promise<Result> => {
-
+  
   const isAmountNonPositive = input.amount <= 0
   if(isAmountNonPositive) {
     return {
@@ -44,6 +45,8 @@ export const createTransactionResolver = async ({ input }: Input): Promise<Resul
     }
   }
 
+
+  // transaction e lenta trava tabela
   const session = await mongoose.startSession()
   session.startTransaction();
 
@@ -79,6 +82,9 @@ export const createTransactionResolver = async ({ input }: Input): Promise<Resul
   }
 
 }
+
+export const generateUniqueTransactionKey = (input: TCreateTransactionInput): string =>
+  input.senderId + ":" + input.receiverId + ":" + input.amount 
 
 const senderHasEnoughMoney = (account: IAccount, amount: number) => 
   account.balance > amount
