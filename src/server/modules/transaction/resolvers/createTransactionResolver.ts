@@ -1,6 +1,6 @@
 import { redisClient } from "../../../config/redis";
 import { Account, IAccount } from "../../account/AccountModel";
-import { AmountNonPositive, AmountNonPositiveType } from "../errors/AmountNonPositiveType";
+import { AmountNonPositive } from "../errors/AmountNonPositiveType";
 import { SenderNotEnoughBalance } from "../errors/SenderNotEnoughBalanceType";
 import { TransactionAccountsNotFound } from "../errors/TransactionAccountsNotFoundType";
 import { TCreateTransactionInput } from "../inputs/CreateTransactionInput";
@@ -17,6 +17,20 @@ type Result = ITransaction
  | SenderNotEnoughBalance
 
 export const createTransactionResolver = async ({ input }: Input): Promise<Result> => {
+
+  const foundIdempotencyId = await redisClient.get(input.idempotencyId);
+
+  if(foundIdempotencyId) {
+    return await Transaction
+      .findOne({
+        sender: {_id: input.senderId},
+        receiver: {_id: input.receiverId},
+        amount: input.amount
+      })
+      .populate("sender")
+      .populate("receiver")
+      .sort({createdAt: -1}) as ITransaction
+  }
   
   const isAmountNonPositive = input.amount <= 0
   if(isAmountNonPositive) {
@@ -72,6 +86,10 @@ export const createTransactionResolver = async ({ input }: Input): Promise<Resul
       receiver
     }).save()
 
+    await redisClient.setEx(
+      input.idempotencyId, 2, input.idempotencyId
+    );
+
     return transaction
 
   } catch (error) {
@@ -82,9 +100,6 @@ export const createTransactionResolver = async ({ input }: Input): Promise<Resul
   }
 
 }
-
-export const generateUniqueTransactionKey = (input: TCreateTransactionInput): string =>
-  input.senderId + ":" + input.receiverId + ":" + input.amount 
 
 const senderHasEnoughMoney = (account: IAccount, amount: number) => 
   account.balance > amount

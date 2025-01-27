@@ -3,7 +3,8 @@ import { GraphQLFloat, GraphQLInputObjectType, GraphQLString } from "graphql";
 export type TCreateTransactionInput = {
   senderId: string,
   receiverId: string,
-  amount: number
+  amount: number,
+  idempotencyId: string,
 }
 
 export const CreateTransactionInput = new GraphQLInputObjectType({
@@ -17,6 +18,9 @@ export const CreateTransactionInput = new GraphQLInputObjectType({
     },
     amount: {
       type: GraphQLFloat
+    },
+    idempotencyId: {
+      type: GraphQLString
     }
   },
 });
