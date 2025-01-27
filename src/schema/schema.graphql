@@ -11,5 +11,5 @@ type Account {
 }
 
 type Mutation {
-  createAccount(name: String, cpf: String): Account
+  accountCreate(name: String, cpf: String): Account
 }

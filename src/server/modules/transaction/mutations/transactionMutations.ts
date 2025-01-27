@@ -1,5 +1,5 @@
-import { createTransaction } from "./createTransaction";
+import { transactionCreate } from "./transactionCreate";
 
 export const transactionMutations = {
-  createTransaction
+  transactionCreate
 }

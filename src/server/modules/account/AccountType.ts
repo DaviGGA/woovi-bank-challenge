@@ -30,8 +30,8 @@ export const AccountType = new GraphQLObjectType<IAccount>({
   })
 })
 
-export const CreateAccountResultType = new GraphQLUnionType({
-  name: "CreateAccountResult",
+export const AccountCreateResultType = new GraphQLUnionType({
+  name: "AccountCreateResult",
   types: [
     AccountType,
     InvalidCpfType,

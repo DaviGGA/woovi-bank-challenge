@@ -1,14 +1,14 @@
 import { GraphQLFloat, GraphQLInputObjectType, GraphQLString } from "graphql";
 
-export type TCreateTransactionInput = {
+export type TTransactionCreateInput = {
   senderId: string,
   receiverId: string,
   amount: number,
   idempotencyId: string,
 }
 
-export const CreateTransactionInput = new GraphQLInputObjectType({
-  name: 'CreateTransactionInput',
+export const TransactionCreateInput = new GraphQLInputObjectType({
+  name: 'TransactionCreateInput',
   fields: {
     senderId: {
       type: GraphQLString,

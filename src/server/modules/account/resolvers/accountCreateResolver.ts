@@ -1,18 +1,18 @@
-import { TCreateAccountInput } from "../inputs/CreateAccountInput";
+import { TAccountCreateInput } from "../inputs/AccountCreateInput";
 import { IAccount, Account } from "../AccountModel";
 import { clearCpf, validateCpf } from "../../../../helpers/cpf-helpers";
 import { InvalidCpf } from "../errors/InvalidCpfType";
 import { AccountAlrealdyExist } from "../errors/AccountAlrealdyExistType";
 
 type Input = {
-  input: TCreateAccountInput
+  input: TAccountCreateInput
 }
 
 type Result = IAccount
   | InvalidCpf
   | AccountAlrealdyExist
 
-export const createAccountResolver = async ({ input }: Input): Promise<Result> => {
+export const accountCreateResolver = async ({ input }: Input): Promise<Result> => {
 
   if(!validateCpf(input.cpf)) {
     return {

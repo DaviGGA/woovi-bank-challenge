@@ -3,12 +3,12 @@ import { Account, IAccount } from "../../account/AccountModel";
 import { AmountNonPositive } from "../errors/AmountNonPositiveType";
 import { SenderNotEnoughBalance } from "../errors/SenderNotEnoughBalanceType";
 import { TransactionAccountsNotFound } from "../errors/TransactionAccountsNotFoundType";
-import { TCreateTransactionInput } from "../inputs/CreateTransactionInput";
+import { TTransactionCreateInput } from "../inputs/TransactionCreateInput";
 import { ITransaction, Transaction } from "../TransactionModel";
 import mongoose from "mongoose";
 
 type Input = {
-  input: TCreateTransactionInput
+  input: TTransactionCreateInput
 }
 
 type Result = ITransaction 
@@ -16,7 +16,7 @@ type Result = ITransaction
  | TransactionAccountsNotFound
  | SenderNotEnoughBalance
 
-export const createTransactionResolver = async ({ input }: Input): Promise<Result> => {
+export const transactionCreateResolver = async ({ input }: Input): Promise<Result> => {
 
   const foundIdempotencyId = await redisClient.get(input.idempotencyId);
 
