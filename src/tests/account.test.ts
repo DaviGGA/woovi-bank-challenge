@@ -131,7 +131,7 @@ describe("Account", () => {
     const query = 
       `
       mutation {
-        createTransaction(input: {
+        transactionCreate(input: {
           senderId: "${senderId}",
           receiverId: "${receiverId}",
           amount: 10,
@@ -159,11 +159,11 @@ describe("Account", () => {
       .send({query})
       .expect(200)
 
-    expect(response.body.data.createTransaction.sender.name).toBe("John Sender");
-    expect(response.body.data.createTransaction.sender.balance).toBe(990);
+    expect(response.body.data.transactionCreate.sender.name).toBe("John Sender");
+    expect(response.body.data.transactionCreate.sender.balance).toBe(990);
 
-    expect(response.body.data.createTransaction.receiver.name).toBe("Jane Receiver");
-    expect(response.body.data.createTransaction.receiver.balance).toBe(1010);
+    expect(response.body.data.transactionCreate.receiver.name).toBe("Jane Receiver");
+    expect(response.body.data.transactionCreate.receiver.balance).toBe(1010);
   })
 
   it("transactionCreate idempotency", async () => {
@@ -188,7 +188,7 @@ describe("Account", () => {
     const query = 
       `
       mutation {
-        createTransaction(input: {
+        transactionCreate(input: {
           senderId: "${senderId}",
           receiverId: "${receiverId}",
           amount: 15,
@@ -211,7 +211,7 @@ describe("Account", () => {
       .send({query})
       .expect(200)
 
-    expect(transactionOne.body.data.createTransaction._id)
-      .toBe(transactionTwo.body.data.createTransaction._id)
+    expect(transactionOne.body.data.transactionCreate._id)
+      .toBe(transactionTwo.body.data.transactionCreate._id)
   })
 })

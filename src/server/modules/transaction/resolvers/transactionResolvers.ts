@@ -1,5 +1,5 @@
-import { createTransactionResolver } from "./createTransactionResolver";
+import { transactionCreateResolver } from "./transactionCreateResolver";
 
 export const transactionResolvers = {
-  createTransaction: createTransactionResolver
+  transactionCreate: transactionCreateResolver
 }
