@@ -1,8 +1,8 @@
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, ObjectId } from "mongoose";
 import { IAccount } from "../account/AccountModel";
 
 export type ITransaction = {
-  receiver: IAccount,
+  receiverId: ObjectId,
   type: "c" | "d",
   amount: number,
   createdAt: Date,
@@ -11,10 +11,8 @@ export type ITransaction = {
 
 const Schema = new mongoose.Schema<ITransaction>(
   {
-    receiver: {
+    receiverId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
-      description: "User who is receiving the amount",
       required: true
     },
     type: {

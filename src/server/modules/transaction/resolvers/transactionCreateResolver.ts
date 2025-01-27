@@ -41,14 +41,20 @@ export const transactionCreateResolver = async ({ input }: Input): Promise<Resul
     }
   }
 
-  const senderPromise = Account.findById(input.senderId);
-  const receiverPromise = Account.findById(input.receiverId);
+  const accounts = await Account.find({
+    $or: [
+      {_id: input.senderId},
+      {_id: input.receiverId}
+    ]
+  })
+  
+  const sender = accounts
+    .find(acc => acc._id.toString() === input.senderId);
+  
+  const receiver = accounts
+    .find(acc => acc._id.toString() === input.receiverId);
 
-  const [sender, receiver] = await Promise.all([
-    senderPromise, 
-    receiverPromise
-  ])
-
+  
   const accountsNotFound = !sender || !receiver
   if(accountsNotFound) {
     return {
@@ -58,7 +64,6 @@ export const transactionCreateResolver = async ({ input }: Input): Promise<Resul
       receiverFound: !!receiver
     }
   }
-
 
   // transaction e lenta trava tabela
   const session = await mongoose.startSession()

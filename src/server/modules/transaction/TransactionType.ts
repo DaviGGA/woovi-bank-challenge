@@ -12,8 +12,8 @@ export const TransationType = new GraphQLObjectType<ITransaction>({
     _id: {
       type: GraphQLString
     },
-    receiver: {
-      type: AccountType
+    receiverId: {
+      type: GraphQLString
     },
     type: {
       type: GraphQLString
