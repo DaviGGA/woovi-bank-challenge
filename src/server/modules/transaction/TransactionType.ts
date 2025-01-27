@@ -7,27 +7,31 @@ import { SenderNotEnoughBalanceType } from "./errors/SenderNotEnoughBalanceType"
 
 export const TransationType = new GraphQLObjectType<ITransaction>({
   name: "Transaction",
-  description: "Bank account of the user",
+  description: "Transaction of the user",
   fields: () => ({
     _id: {
       type: GraphQLString
     },
-    sender: {
-      type: AccountType
-    },
     receiver: {
       type: AccountType
+    },
+    type: {
+      type: GraphQLString
     },
     amount: {
       type: GraphQLFloat
     },
     createdAt: {
       type: GraphQLString,
-      resolve: (transaction) => transaction.createdAt ? transaction.createdAt.toISOString() : null
+      resolve: (transaction) => 
+        transaction.createdAt ? 
+        transaction.createdAt.toISOString() : null
     },
     updatedAt: {
       type: GraphQLString,
-      resolve: (transaction) => transaction.createdAt ? transaction.updatedAt.toISOString() : null
+      resolve: 
+        (transaction) => transaction.createdAt ? 
+        transaction.updatedAt.toISOString() : null
     },
   })
 })

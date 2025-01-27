@@ -1,10 +1,9 @@
 import mongoose, { Model } from "mongoose";
 import { IAccount } from "../account/AccountModel";
-import { Account } from "../account/AccountModel";
 
 export type ITransaction = {
-  sender: IAccount,
   receiver: IAccount,
+  type: "c" | "d",
   amount: number,
   createdAt: Date,
 	updatedAt: Date
@@ -12,19 +11,21 @@ export type ITransaction = {
 
 const Schema = new mongoose.Schema<ITransaction>(
   {
-    sender: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
-      description: "User who is sending the amount"
-    },
     receiver: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Account",
-      description: "User who is receiving the amount"
+      description: "User who is receiving the amount",
+      required: true
+    },
+    type: {
+      type: String,
+      enum: ["c", "d"],
+      required: true
     },
     amount: {
       type: Number,
       description: "",
+      required: true
     }
   },
   {
