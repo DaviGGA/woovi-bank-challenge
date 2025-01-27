@@ -26,10 +26,10 @@ describe("Account", () => {
     await mongoose.connection.dropDatabase()
   })
 
-  it("createAccount successfully", async () => {
+  it("accountCreate successfully", async () => {
     const query = `
       mutation {
-        createAccount(input: {name: "John Doe", cpf: "986.453.580-34"}) {
+        accountCreate(input: {name: "John Doe", cpf: "986.453.580-34"}) {
           ... on Account {
             name
             cpf
@@ -45,16 +45,16 @@ describe("Account", () => {
       .expect(200)
 
 
-    expect(response.body.data.createAccount.name).toBe("John Doe");
-    expect(response.body.data.createAccount.cpf).toBe("98645358034");
-    expect(response.body.data.createAccount.balance).toBe(1000);
+    expect(response.body.data.accountCreate.name).toBe("John Doe");
+    expect(response.body.data.accountCreate.cpf).toBe("98645358034");
+    expect(response.body.data.accountCreate.balance).toBe(1000);
 
   })
 
-  it("createAccount fails when creating account with same cpf twice", async () => {
+  it("accountCreate fails when creating account with same cpf twice", async () => {
     const query = `
       mutation {
-        createAccount(input: {name: "John Doe", cpf: "986.453.580-34"}) {
+        accountCreate(input: {name: "John Doe", cpf: "986.453.580-34"}) {
           ... on AccountAlrealdyExist {
                 __typename
               }
@@ -72,13 +72,13 @@ describe("Account", () => {
       .send({ query })
       .expect(200)
 
-    expect(response.body.data.createAccount.__typename).toBe("AccountAlrealdyExist")
+    expect(response.body.data.accountCreate.__typename).toBe("AccountAlrealdyExist")
   })
 
-  it("createAccount fails when passing invalid cpf", async () => {
+  it("accountCreate fails when passing invalid cpf", async () => {
     const query = `
       mutation {
-        createAccount(input: {name: "John Doe", cpf: "986.453.580-35"}) {
+        accountCreate(input: {name: "John Doe", cpf: "986.453.580-35"}) {
           ... on InvalidCpf {
             __typename
           }
@@ -91,13 +91,13 @@ describe("Account", () => {
       .send({ query })
       .expect(200)
 
-    expect(response.body.data.createAccount.__typename).toBe("InvalidCpf");
+    expect(response.body.data.accountCreate.__typename).toBe("InvalidCpf");
   })
 
   const accountMutation = (name: string, cpf: string) =>
     `
     mutation {
-      createAccount(input: {name: "${name}", cpf: "${cpf}"}) {
+      accountCreate(input: {name: "${name}", cpf: "${cpf}"}) {
         ... on Account {
           _id
           name
@@ -125,8 +125,8 @@ describe("Account", () => {
       accountTwoPromise
     ]);
 
-    const senderId = accountOne.body.data.createAccount._id
-    const receiverId = accountTwo.body.data.createAccount._id
+    const senderId = accountOne.body.data.accountCreate._id
+    const receiverId = accountTwo.body.data.accountCreate._id
 
     const query = 
       `
@@ -182,8 +182,8 @@ describe("Account", () => {
       accountTwoPromise
     ]);
 
-    const senderId = accountOne.body.data.createAccount._id
-    const receiverId = accountTwo.body.data.createAccount._id
+    const senderId = accountOne.body.data.accountCreate._id
+    const receiverId = accountTwo.body.data.accountCreate._id
 
     const query = 
       `

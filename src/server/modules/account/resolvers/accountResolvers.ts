@@ -1,5 +1,5 @@
-import { createAccountResolver } from "./create-account-resolver";
+import { accountCreateResolver } from "./accountCreateResolver";
 
 export const accountResolvers = {
-  createAccount: createAccountResolver
+  accountCreate: accountCreateResolver
 }

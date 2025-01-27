@@ -1,6 +1,5 @@
-import { createAccount } from "./createAccount"
-
+import { accountCreate } from "./accountCreate"
 
 export const accountMutations = {
-  createAccount
+  accountCreate
 }
