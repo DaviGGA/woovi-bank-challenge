@@ -1,8 +1,8 @@
 import mongoose, { Model, ObjectId } from "mongoose";
-import { IAccount } from "../account/AccountModel";
 
 export type ITransaction = {
   receiverId: ObjectId,
+  senderId: ObjectId,
   type: "c" | "d",
   amount: number,
   createdAt: Date,
@@ -13,7 +13,9 @@ const Schema = new mongoose.Schema<ITransaction>(
   {
     receiverId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true
+    },
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
     },
     type: {
       type: String,
