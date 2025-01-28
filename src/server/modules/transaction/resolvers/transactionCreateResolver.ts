@@ -18,10 +18,16 @@ type Result = TransactionCreated
 
 export const transactionCreateResolver = async ({ input }: Input): Promise<Result> => {
 
+  // @Sib a solução apresentada para idempontência está próximo do que se espera?
+
   const foundIdempotencyId = await redisClient.get(input.idempotencyId);
 
   if(foundIdempotencyId) return input
   
+
+
+  // @Sib você tinha dito que tipo para cada erro era overkill, então seria melhor retornar apenas um campo com o código do erro?
+
   const isAmountNonPositive = input.amount <= 0
   if(isAmountNonPositive) {
     return {
@@ -32,7 +38,9 @@ export const transactionCreateResolver = async ({ input }: Input): Promise<Resul
   }
 
   // @Sib como garantir rollback das operações caso uma falhe sem transaction?
-
+  // Não consegui chegar em uma ideia boa, a maioria envolvia coisas complexas e bem error prone
+  // como guardar o id das operações que funcionaram e revertê-las em caso de algum erro.
+  
   const accounts = await Account.find({
     $or: [
       {_id: input.senderId},
