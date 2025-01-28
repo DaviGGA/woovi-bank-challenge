@@ -2,7 +2,7 @@ import { GraphQLFloat, GraphQLList, GraphQLObjectType, GraphQLString, GraphQLUni
 import { IAccount } from "./AccountModel";
 import { InvalidCpfType } from "./errors/InvalidCpfType";
 import { AccountAlrealdyExistType } from "./errors/AccountAlrealdyExistType";
-import { TransationType } from "../transaction/TransactionType";
+import { TransactionType } from "../transaction/TransactionType";
 
 export const AccountType = new GraphQLObjectType<IAccount>({
   name: "Account",
@@ -21,7 +21,7 @@ export const AccountType = new GraphQLObjectType<IAccount>({
       type: GraphQLFloat,
     },
     transactions: {
-      type : new GraphQLList(TransationType),
+      type : new GraphQLList(TransactionType),
       
     },
     createdAt: {
