@@ -1,10 +1,12 @@
 import mongoose, { Model } from "mongoose";
+import { ITransaction } from "../transaction/TransactionModel";
 
 export type IAccount = {
   name: string,
   cpf: string,
   balance: number,
   createdAt: Date,
+  transactions: ITransaction[],
 	updatedAt: Date
 } & Document
 
@@ -12,17 +14,23 @@ const Schema = new mongoose.Schema<IAccount>(
   {
     name: {
       type: String,
-      description: "The name of the account owner."
+      required: true,
     },
     cpf: {
       type: String,
-      description: "CPF document of the account owner"
+      required: true,
     },
     balance: {
       type: Number,
       default: 1000, // starting with 1k for test purposes
-      description: "Amount of cash this user has in his account",
-    }
+    },
+    transactions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Transaction",
+        default: []
+      }
+    ]
   },
   {
     collection: "Account",

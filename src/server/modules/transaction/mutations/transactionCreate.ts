@@ -1,9 +1,9 @@
 import { GraphQLFieldConfig, GraphQLNonNull } from "graphql";
 import { TransactionCreateInput } from "../inputs/TransactionCreateInput";
-import { TransactionResultType } from "../TransactionType";
+import { TransactionCreatedResultType } from "../TransactionCreateResultType";
 
 export const transactionCreate: GraphQLFieldConfig<any, any> = {
-  type: TransactionResultType,
+  type: TransactionCreatedResultType,
   args: {
     input: {
       type: new GraphQLNonNull(TransactionCreateInput)

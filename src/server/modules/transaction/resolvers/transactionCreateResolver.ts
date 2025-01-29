@@ -5,33 +5,29 @@ import { SenderNotEnoughBalance } from "../errors/SenderNotEnoughBalanceType";
 import { TransactionAccountsNotFound } from "../errors/TransactionAccountsNotFoundType";
 import { TTransactionCreateInput } from "../inputs/TransactionCreateInput";
 import { ITransaction, Transaction } from "../TransactionModel";
-import mongoose from "mongoose";
+import { TransactionCreated } from "../TransactionCreateResultType"
 
 type Input = {
   input: TTransactionCreateInput
 }
 
-type Result = ITransaction 
+type Result = TransactionCreated 
  | AmountNonPositive
  | TransactionAccountsNotFound
  | SenderNotEnoughBalance
 
 export const transactionCreateResolver = async ({ input }: Input): Promise<Result> => {
 
+  // @Sib a solução apresentada para idempontência está próximo do que se espera?
+
   const foundIdempotencyId = await redisClient.get(input.idempotencyId);
 
-  if(foundIdempotencyId) {
-    return await Transaction
-      .findOne({
-        sender: {_id: input.senderId},
-        receiver: {_id: input.receiverId},
-        amount: input.amount
-      })
-      .populate("sender")
-      .populate("receiver")
-      .sort({createdAt: -1}) as ITransaction
-  }
+  if(foundIdempotencyId) return input
   
+
+
+  // @Sib você tinha dito que tipo para cada erro era overkill, então seria melhor retornar apenas um campo com o código do erro?
+
   const isAmountNonPositive = input.amount <= 0
   if(isAmountNonPositive) {
     return {
@@ -41,14 +37,24 @@ export const transactionCreateResolver = async ({ input }: Input): Promise<Resul
     }
   }
 
-  const senderPromise = Account.findById(input.senderId);
-  const receiverPromise = Account.findById(input.receiverId);
+  // @Sib como garantir rollback das operações caso uma falhe sem transaction?
+  // Não consegui chegar em uma ideia boa, a maioria envolvia coisas complexas e bem error prone
+  // como guardar o id das operações que funcionaram e revertê-las em caso de algum erro.
+  
+  const accounts = await Account.find({
+    $or: [
+      {_id: input.senderId},
+      {_id: input.receiverId}
+    ]
+  }).populate("transactions")
+  
+  const sender = accounts
+    .find(acc => acc._id.toString() === input.senderId);
+  
+  const receiver = accounts
+    .find(acc => acc._id.toString() === input.receiverId);
 
-  const [sender, receiver] = await Promise.all([
-    senderPromise, 
-    receiverPromise
-  ])
-
+  
   const accountsNotFound = !sender || !receiver
   if(accountsNotFound) {
     return {
@@ -59,11 +65,6 @@ export const transactionCreateResolver = async ({ input }: Input): Promise<Resul
     }
   }
 
-
-  // transaction e lenta trava tabela
-  const session = await mongoose.startSession()
-  session.startTransaction();
-
   if(!senderHasEnoughMoney(sender, input.amount)) {
     return {
       name: "SenderNotEnoughBalance",
@@ -73,32 +74,36 @@ export const transactionCreateResolver = async ({ input }: Input): Promise<Resul
     }
   }
 
-  try {
-    receiver.balance = incrementBalance(receiver, input.amount);
-    sender.balance = decrementBalance(sender, input.amount);
-
-    await sender.save();
-    await receiver.save();
-
-    const transaction = await new Transaction({
+  const [creditTransaction, debitTransaction] = await Transaction.create([
+    {
+      receiverId: input.receiverId,
+      senderId: input.senderId,
       amount: input.amount,
-      sender,
-      receiver
-    }).save()
+      type: "c"
+    },
+    {
+      receiverId: input.receiverId,
+      senderId: input.senderId,
+      amount: input.amount,
+      type: "d"
+    }
+  ])
 
-    await redisClient.setEx(
-      input.idempotencyId, 2, input.idempotencyId
-    );
+  await Account.findByIdAndUpdate(input.senderId, {
+    balance: decrementBalance(sender, input.amount),
+    transactions: [...sender.transactions, creditTransaction]
+  }, {new: true})
 
-    return transaction
+  await Account.findByIdAndUpdate(input.receiverId, {
+    balance: incrementBalance(receiver, input.amount),
+    transactions: [...receiver.transactions, debitTransaction]
+  })
 
-  } catch (error) {
-    await session.abortTransaction();
-    throw error
-  } finally {
-    session.endSession()
-  }
+  await redisClient.setEx(
+    input.idempotencyId, 2, input.idempotencyId
+  );
 
+  return input;
 }
 
 const senderHasEnoughMoney = (account: IAccount, amount: number) => 
