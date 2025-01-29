@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx ts-node ./src/index.ts",
+    "populate": "npx ts-node ./src/scripts/populate-test-database.ts",
     "lint": "npx eslint",
     "test": "jest",
     "compose:up": "docker-compose -f docker-compose.yml up -d"
